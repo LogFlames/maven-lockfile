@@ -88,7 +88,7 @@ jobs:
         uses: jreleaser/release-action@f69e545b05f149483cecb2fb81866247992694b8
         with:
           setup-java: false
-          version: 1.4.0
+          version: 1.15.0
           arguments: full-release 
           arguments: "--dry-run"
         env:
