@@ -90,7 +90,7 @@ jobs:
           setup-java: false
           version: 1.4.0
           arguments: full-release 
-          dry-run: true
+          arguments: "--dry-run"
         env:
           JRELEASER_PROJECT_VERSION: ${{ env.NEXT_VERSION }}
           JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
