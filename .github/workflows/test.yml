@@ -22,9 +22,14 @@ jobs:
         run: |
           touch a.txt
           touch b.txt
+          git add .
           git checkout -b test-branch-1
           git commit -am "🔖 Releasing version test-branch-1"
           git push --set-upstream origin test-branch-1
+      - name: ff-mergee
+        run: |
+          git checkout main
+          git merge --ff-only test-branch-1
       - name: Attempt Push with Retry
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
