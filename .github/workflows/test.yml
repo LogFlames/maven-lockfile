@@ -1,0 +1,47 @@
+name: Test ff-merge
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+# Setups the environment
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
+      - name: Set git user
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "<>"
+      - name: commit changes
+        run: |
+          touch a.txt
+          touch b.txt
+          git checkout -b test-branch-1
+          git commit -am "🔖 Releasing version test-branch-1"
+          git push --set-upstream origin test-branch-1
+      - name: Attempt Push with Retry
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RETRY_MAX_TIME: 600
+          RETRY_INTERVAL: 10
+        run: |
+          gh pr create --base main --head test-branch-1 --title "Test-branch-1 ff-merge" --body "Test branch for ff-merge"
+
+          START_TIME=$(date +%s)
+          while true; do
+            git push origin main && break
+            ELAPSED_TIME=$(( $(date +%s) - START_TIME ))
+            if [ "$ELAPSED_TIME" -ge $RETRY_MAX_TIME ]; then
+              echo "Push failed after $RETRY_MAX_TIME seconds. Exiting..."
+              exit 1
+            fi
+
+            echo "Push failed. Retrying in $RETRY_INTERVAL seconds..."
+            sleep $RETRY_INTERVAL
+          done
